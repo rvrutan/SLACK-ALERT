@@ -1,0 +1,40 @@
+service: sudoku-api
+useDotenv: true
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  environment:
+   MONGODB_URI: ${env:MONGODB_URI}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 'sns:*'
+          Resource: 'arn:aws:sns:us-east-1:440744241803:BOOTCAMP_TOPIC'
+
+functions:
+  get-new-game:
+    handler: src/getNewGame.handler
+    events:
+      - httpApi:
+          path: /getsudoku
+          method: get
+  get-mongodb-data:
+    handler: src/getMongodbData.handler
+    events:
+      - httpApi:
+          path: /getmongodbdata
+          method: get 
+  read-from-topic:
+    handler: src/readFromTopic.handler
+    events:
+      - sns:
+          arn: arn:aws:sns:us-east-1:440744241803:BOOTCAMP_TOPIC
+  post-message:
+    handler: src/postToTopic.handler
+    events:
+      - httpApi:
+          path: /posttotopic
+          method: post
